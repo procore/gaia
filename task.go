@@ -5,7 +5,7 @@ package gaia
 //	- taskID string
 //		id of the task to get
 //  - nodes string
-//		comma seperated list of nodes to query
+//		comma separated list of nodes to query
 func (c *Client) GetTask(taskID string, nodes string) string {
 	r := c.newRequest()
 	endpoint := "_tasks"

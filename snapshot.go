@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Jeffail/gabs"
-	"github.com/spf13/viper"
 )
 
 // A SnapshotResult represents the data returned from the completion of a snapshot
@@ -66,18 +65,21 @@ func (c *Client) SnapshotStart(n string, r string, b string, w bool, notify bool
 	if notify {
 		sr := &SnapshotResult{}
 		err := json.Unmarshal([]byte(resp), sr)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if !strings.EqualFold(sr.Snapshot.State, "SUCCESS") {
 			// Do nothing if we just have the .kibana index
 			if len(sr.Snapshot.Indices) == 1 && strings.EqualFold(sr.Snapshot.Indices[0], ".kibana") {
-			} else if !strings.EqualFold(viper.GetString("slack"), "") { // If the slack channel webhook is provided
+			} else if !strings.EqualFold(s, "") { // If the slack channel webhook is provided
 				msg := fmt.Sprintf("NAME: %s\nSTART_TIME: %s\nSTATE: %s\nFAILURES: %v",
 					sr.Snapshot.Snapshot,
 					sr.Snapshot.StartTime,
 					sr.Snapshot.State,
 					sr.Snapshot.Failures)
 
-				err = SendSlackNotification(viper.GetString("slack"), msg)
+				err = SendSlackNotification(s, msg)
 				if err != nil {
 					log.Fatal(err)
 				}

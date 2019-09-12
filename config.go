@@ -17,7 +17,7 @@ type Config struct {
 	Debug  bool
 }
 
-// NewConfig provides a factory for initalizing a config
+// NewConfig provides a factory for initializing a config
 func NewConfig() *Config {
 	c := &Config{}
 
