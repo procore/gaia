@@ -58,7 +58,7 @@ type slackRequestBody struct {
 //  - s string
 //		slack webhook to send the notification to
 func (c *Client) SnapshotStart(n string, r string, b string, w bool, notify bool, s string) string {
-	req := request{client: c}
+	req := c.newRequest()
 	req.params["wait_for_completion"] = strconv.FormatBool(w)
 	resp := req.put("_snapshot/"+r+"/"+n, b)
 
@@ -95,7 +95,7 @@ func (c *Client) SnapshotStart(n string, r string, b string, w bool, notify bool
 //  - r string
 //  	repository name
 func (c *Client) SnapshotList(r string) string {
-	req := request{client: c}
+	req := c.newRequest()
 	return req.get("_snapshot/" + r + "/_all")
 }
 
@@ -106,7 +106,7 @@ func (c *Client) SnapshotList(r string) string {
 //  - r string
 //  	repository in which the snapshot is located
 func (c *Client) SnapshotGet(n string, r string) string {
-	req := request{client: c}
+	req := c.newRequest()
 	return req.get("_snapshot/" + r + "/" + n)
 }
 
@@ -121,7 +121,7 @@ func (c *Client) SnapshotGet(n string, r string) string {
 //	- w bool
 // 		whether or not to wait for completion
 func (c *Client) SnapshotRestore(n string, r string, b string, w bool) string {
-	req := request{client: c}
+	req := c.newRequest()
 	req.params["wait_for_completion"] = strconv.FormatBool(w)
 	return req.post("_snapshot/"+r+"/"+n+"/_restore", b)
 }
@@ -133,7 +133,7 @@ func (c *Client) SnapshotRestore(n string, r string, b string, w bool) string {
 //  - r string
 //  	repository in which the snapshot is located
 func (c *Client) SnapshotDelete(n string, r string) string {
-	req := request{client: c}
+	req := c.newRequest()
 	return req.delete("_snapshot/" + r + "/" + n)
 }
 
@@ -145,7 +145,7 @@ func (c *Client) SnapshotDelete(n string, r string) string {
 //  - r string
 //  	repository in which the snapshots are located
 func (c *Client) SnapshotClean(n int, r string) {
-	req := request{client: c}
+	req := c.newRequest()
 	req.params["s"] = "end_epoch:desc"
 	req.params["format"] = "json"
 	parsedJSON, err := gabs.ParseJSON([]byte(req.get("_cat/snapshots/" + r)))
@@ -158,7 +158,7 @@ func (c *Client) SnapshotClean(n int, r string) {
 		log.Fatal(err)
 	}
 
-	req = request{client: c}
+	req = c.newRequest()
 	req.params["pretty"] = "true"
 	for _, snap := range a {
 		if sid, ok := snap.Path("id").Data().(string); ok {
@@ -174,7 +174,7 @@ func (c *Client) SnapshotClean(n int, r string) {
 //	- b string
 //		request body
 func (c *Client) SnapshotRepoRegister(r string, b string) string {
-	req := request{client: c}
+	req := c.newRequest()
 	return req.post("_snapshot/"+r, b)
 }
 
