@@ -14,8 +14,8 @@ import (
 	"github.com/Jeffail/gabs"
 )
 
-// A SnapshotResult represents the data returned from the completion of a snapshot
-type SnapshotResult struct {
+// A snapshotResult represents the data returned from the completion of a snapshot
+type snapshotResult struct {
 	Snapshot struct {
 		Snapshot         string
 		UUID             string
@@ -35,8 +35,8 @@ type SnapshotResult struct {
 	}
 }
 
-// SlackRequestBody represents the body of a message to be sent to slack
-type SlackRequestBody struct {
+// slackRequestBody represents the body of a message to be sent to slack
+type slackRequestBody struct {
 	Text string `json:"text"`
 }
 
@@ -63,7 +63,7 @@ func (c *Client) SnapshotStart(n string, r string, b string, w bool, notify bool
 	resp := req.put("_snapshot/"+r+"/"+n, b)
 
 	if notify {
-		sr := &SnapshotResult{}
+		sr := &snapshotResult{}
 		err := json.Unmarshal([]byte(resp), sr)
 		if err != nil {
 			log.Fatal(err)
@@ -79,7 +79,7 @@ func (c *Client) SnapshotStart(n string, r string, b string, w bool, notify bool
 					sr.Snapshot.State,
 					sr.Snapshot.Failures)
 
-				err = SendSlackNotification(s, msg)
+				err = sendSlackNotification(s, msg)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -178,11 +178,11 @@ func (c *Client) SnapshotRepoRegister(r string, b string) string {
 	return req.post("_snapshot/"+r, b)
 }
 
-// SendSlackNotification sends a message to a slack webhook to post
+// sendSlackNotification sends a message to a slack webhook to post
 // the message to a channel
-func SendSlackNotification(webhookURL string, msg string) error {
+func sendSlackNotification(webhookURL string, msg string) error {
 
-	slackBody, _ := json.Marshal(SlackRequestBody{Text: msg})
+	slackBody, _ := json.Marshal(slackRequestBody{Text: msg})
 	req, err := http.NewRequest(http.MethodPost, webhookURL, bytes.NewBuffer(slackBody))
 	if err != nil {
 		return err

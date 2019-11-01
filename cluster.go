@@ -69,3 +69,9 @@ func (c *Client) ToggleRouting(setting string, flatSettings bool) string {
 		"\"persistent\": {\"cluster.routing.allocation.enable\": \"%s\"}}", setting, setting)
 	return r.put("_cluster/settings", t)
 }
+
+// AllocationExplain provides explanations for shard allocations in the cluster
+func (c *Client) AllocationExplain() string {
+	r := c.newRequest()
+	return r.get("_cluster/allocation/explain")
+}
