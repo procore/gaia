@@ -6,14 +6,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/procore/gaia"
 )
 
-func TestClusterAllocationExplain(t *testing.T) {
+func TestIndexAliasGet(t *testing.T) {
+	responseBody := `{"contacts_2_1_0":{"aliases":{"contacts":{}}}}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{"error":{"root_cause":[{"type":"index_not_found_exception","reason":"no such index","resource.type":"index_expression","resource.id":"_cluster","index_uuid":"_na_","index":"_cluster"}]}`)
+		fmt.Fprintln(w, responseBody)
 	}))
 	defer ts.Close()
 
@@ -26,8 +28,8 @@ func TestClusterAllocationExplain(t *testing.T) {
 	config.Net.Host = u.Hostname()
 	config.Net.Port = u.Port()
 	client := gaia.NewClient(config)
-	resp := client.AllocationExplain()
-	if resp == "" {
-		t.Errorf("_cluster/allocation/explain returned no response")
+	resp := client.IndexAliasesGet("contacts")
+	if strings.TrimRight(resp, "\n") != responseBody {
+		t.Errorf("index alias get returned incorrect response")
 	}
 }
